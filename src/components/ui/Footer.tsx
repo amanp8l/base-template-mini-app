@@ -16,15 +16,6 @@ export const Footer: React.FC<FooterProps> = ({ activeTab, setActiveTab, showWal
           activeTab === 'home' ? 'text-purple-500' : 'text-gray-500'
         }`}
       >
-        <span className="text-xl">🏠</span>
-        <span className="text-xs mt-1">Home</span>
-      </button>
-      <button
-        onClick={() => setActiveTab('ai-studio')}
-        className={`flex flex-col items-center justify-center w-full h-full ${
-          activeTab === 'ai-studio' ? 'text-purple-500' : 'text-gray-500'
-        }`}
-      >
         <span className="text-xl">🎨</span>
         <span className="text-xs mt-1">AI Studio</span>
       </button>

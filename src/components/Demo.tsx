@@ -26,7 +26,7 @@ import { Footer } from "~/components/ui/Footer";
 import { USE_WALLET, APP_NAME } from "~/lib/constants";
 import ImageStudio from "~/components/ImageStudio";
 
-export type Tab = "home" | "ai-studio" | "actions" | "context" | "wallet";
+export type Tab = "home" | "actions" | "context" | "wallet";
 
 interface NeynarUser {
   fid: number;
@@ -204,20 +204,6 @@ export default function Demo(
         <h1 className="text-2xl font-bold text-center mb-4">{title}</h1>
 
         {activeTab === "home" && (
-          <div className="flex items-center justify-center h-[calc(100vh-200px)] px-6">
-            <div className="text-center w-full max-w-md mx-auto">
-              <p className="text-sm text-gray-500 mb-4">Create stunning images with AI using Azure OpenAI DALL-E 3</p>
-              <Button 
-                onClick={() => setActiveTab("ai-studio")}
-                className="mx-auto bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-              >
-                Open AI Studio
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "ai-studio" && (
           <ImageStudio />
         )}
 

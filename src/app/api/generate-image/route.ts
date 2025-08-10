@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
         if (errorJson.error?.message) {
           errorMessage = errorJson.error.message;
         }
-      } catch (e) {
+      } catch {
         // If we can't parse the error, use the default message
       }
       

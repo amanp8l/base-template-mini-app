@@ -74,7 +74,7 @@ export default function ImageStudio() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    } catch (err) {
+    } catch {
       setError("Failed to download image");
     }
   };
