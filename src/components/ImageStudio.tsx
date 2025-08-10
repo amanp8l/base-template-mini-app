@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "./ui/Button";
 import { ShareButton } from "./ui/Share";
-import { Download, Loader2, Wand2, RefreshCw, Share2, Sparkles } from "lucide-react";
+import { Download, Loader2, Wand2, RefreshCw, Sparkles } from "lucide-react";
 
 interface GenerationSettings {
   size: "1024x1024" | "1024x1792" | "1792x1024";
@@ -111,7 +111,7 @@ export default function ImageStudio() {
     setError("");
   };
 
-  const usePromptSuggestion = (suggestedPrompt: string) => {
+  const handlePromptSuggestion = (suggestedPrompt: string) => {
     setPrompt(suggestedPrompt);
   };
 
@@ -139,7 +139,7 @@ export default function ImageStudio() {
           {web3Prompts.map((suggestion, index) => (
             <button
               key={index}
-              onClick={() => usePromptSuggestion(suggestion.prompt)}
+              onClick={() => handlePromptSuggestion(suggestion.prompt)}
               className="text-left p-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border border-purple-200/50 dark:border-purple-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 hover:border-purple-300 dark:hover:border-purple-600 transition-all duration-200 group"
             >
               <div className="flex items-center gap-2 mb-1">
@@ -293,7 +293,7 @@ export default function ImageStudio() {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 gap-3">
+              <div className="space-y-3">
                 {/* Share Button */}
                 <ShareButton
                   buttonText="Share on Farcaster"
@@ -306,25 +306,25 @@ export default function ImageStudio() {
                       }
                     ]
                   }}
-                  className="w-full h-12 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+                  className="w-full h-12 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
                 />
                 
                 {/* Action Buttons Row */}
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-3">
                   <Button
                     onClick={() => window.open(imageUrl, '_blank')}
-                    className="h-11 bg-blue-500 hover:bg-blue-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 text-sm"
+                    className="h-12 bg-blue-500 hover:bg-blue-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex flex-col items-center justify-center gap-1"
                   >
                     <span className="text-lg">👁️</span>
-                    <span className="hidden sm:inline">View</span>
+                    <span className="text-xs">View</span>
                   </Button>
                   
                   <Button
                     onClick={downloadImage}
-                    className="h-11 bg-green-500 hover:bg-green-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 text-sm"
+                    className="h-12 bg-green-500 hover:bg-green-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex flex-col items-center justify-center gap-1"
                   >
                     <Download className="w-4 h-4" />
-                    <span className="hidden sm:inline">Download</span>
+                    <span className="text-xs">Download</span>
                   </Button>
                   
                   <Button
@@ -333,15 +333,15 @@ export default function ImageStudio() {
                       setRevisedPrompt("");
                       setError("");
                     }}
-                    className="h-11 bg-orange-500 hover:bg-orange-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 text-sm"
+                    className="h-12 bg-orange-500 hover:bg-orange-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex flex-col items-center justify-center gap-1"
                   >
                     <RefreshCw className="w-4 h-4" />
-                    <span className="hidden sm:inline">Retry</span>
+                    <span className="text-xs">Retry</span>
                   </Button>
                 </div>
                 
                 {/* Quick Actions */}
-                <div className="flex gap-2 pt-2">
+                <div className="grid grid-cols-2 gap-3">
                   <Button
                     onClick={() => {
                       if (navigator.share && imageUrl) {
@@ -357,9 +357,10 @@ export default function ImageStudio() {
                         navigator.clipboard.writeText(imageUrl);
                       }
                     }}
-                    className="flex-1 h-9 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium border border-gray-300 dark:border-gray-600 transition-all duration-200"
+                    className="h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium border border-gray-300 dark:border-gray-600 transition-all duration-200 flex items-center justify-center gap-2"
                   >
-                    📋 Copy Link
+                    <span>📋</span>
+                    <span>Copy Link</span>
                   </Button>
                   
                   <Button
@@ -367,9 +368,10 @@ export default function ImageStudio() {
                       const newPrompt = prompt + " with different style and composition";
                       setPrompt(newPrompt);
                     }}
-                    className="flex-1 h-9 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium border border-gray-300 dark:border-gray-600 transition-all duration-200"
+                    className="h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium border border-gray-300 dark:border-gray-600 transition-all duration-200 flex items-center justify-center gap-2"
                   >
-                    🎲 Remix
+                    <span>🎲</span>
+                    <span>Remix</span>
                   </Button>
                 </div>
               </div>
