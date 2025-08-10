@@ -26,7 +26,7 @@ import { Footer } from "~/components/ui/Footer";
 import { USE_WALLET, APP_NAME } from "~/lib/constants";
 import ImageStudio from "~/components/ImageStudio";
 
-export type Tab = "home" | "actions" | "context" | "wallet";
+export type Tab = "home" | "account" | "wallet";
 
 interface NeynarUser {
   fid: number;
@@ -36,11 +36,11 @@ interface NeynarUser {
 export default function Demo(
   { title }: { title?: string } = { title: "Frames v2 Demo" }
 ) {
-  const { isSDKLoaded, context, added, notificationDetails, actions } =
+  const { isSDKLoaded, context, added, actions } =
     useMiniApp();
   const [activeTab, setActiveTab] = useState<Tab>("home");
   const [txHash, setTxHash] = useState<string | null>(null);
-  const [sendNotificationResult, setSendNotificationResult] = useState("");
+
   const [copied, setCopied] = useState(false);
   const [neynarUser, setNeynarUser] = useState<NeynarUser | null>(null);
 
@@ -121,37 +121,7 @@ export default function Demo(
     switchChain({ chainId: nextChain.id });
   }, [switchChain, nextChain.id]);
 
-  const sendNotification = useCallback(async () => {
-    setSendNotificationResult("");
-    if (!notificationDetails || !context) {
-      return;
-    }
 
-    try {
-      const response = await fetch("/api/send-notification", {
-        method: "POST",
-        mode: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fid: context.user.fid,
-          notificationDetails,
-        }),
-      });
-
-      if (response.status === 200) {
-        setSendNotificationResult("Success");
-        return;
-      } else if (response.status === 429) {
-        setSendNotificationResult("Rate limited");
-        return;
-      }
-
-      const data = await response.text();
-      setSendNotificationResult(`Error: ${data}`);
-    } catch (error) {
-      setSendNotificationResult(`Error: ${error}`);
-    }
-  }, [context, notificationDetails]);
 
   const sendTx = useCallback(() => {
     sendTransaction(
@@ -207,82 +177,113 @@ export default function Demo(
           <ImageStudio />
         )}
 
-        {activeTab === "actions" && (
-          <div className="space-y-3 px-6 w-full max-w-md mx-auto">
-            <ShareButton
-              buttonText="Share Mini App"
-              cast={{
-                text: "Check out this awesome frame @1 @2 @3! 🚀🪐",
-                bestFriends: true,
-                embeds: [
-                  `${process.env.NEXT_PUBLIC_URL}/share/${
-                    context?.user?.fid || ""
-                  }`,
-                ],
-              }}
-              className="w-full"
-            />
-
-            <Button
-              onClick={() =>
-                actions.openUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-              }
-              className="w-full"
-            >
-              Open Link
-            </Button>
-
-            <Button onClick={actions.close} className="w-full">
-              Close Mini App
-            </Button>
-
-            <Button
-              onClick={actions.addMiniApp}
-              disabled={added}
-              className="w-full"
-            >
-              Add Mini App to Client
-            </Button>
-
-            {sendNotificationResult && (
-              <div className="text-sm w-full">
-                Send notification result: {sendNotificationResult}
+        {activeTab === "account" && (
+          <div className="space-y-4 px-6 w-full max-w-md mx-auto">
+            <h2 className="text-lg font-semibold text-center text-foreground">
+              Account Connections
+            </h2>
+            
+            {/* Farcaster Account Info */}
+            {context?.user && (
+              <div className="p-4 bg-card text-card-foreground rounded-lg border border-border">
+                <h3 className="font-semibold text-sm mb-2 text-primary">Farcaster Account</h3>
+                <div className="flex items-center gap-3 mb-2">
+                  {context.user.pfpUrl && (
+                    <img
+                      src={context.user.pfpUrl}
+                      alt="Profile"
+                      className="w-12 h-12 rounded-full border-2 border-primary"
+                    />
+                  )}
+                  <div>
+                    <p className="font-medium text-sm">
+                      {context.user.displayName || context.user.username}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      @{context.user.username}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      FID: {context.user.fid}
+                    </p>
+                  </div>
+                </div>
+                {neynarUser && (
+                  <p className="text-xs text-muted-foreground">
+                    Neynar Score: {neynarUser.score}
+                  </p>
+                )}
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span className="text-xs text-green-600">Connected</span>
+                </div>
               </div>
             )}
-            <Button
-              onClick={sendNotification}
-              disabled={!notificationDetails}
-              className="w-full"
-            >
-              Send notification
-            </Button>
 
-            <Button
-              onClick={async () => {
-                if (context?.user?.fid) {
-                  const shareUrl = `${process.env.NEXT_PUBLIC_URL}/share/${context.user.fid}`;
-                  await navigator.clipboard.writeText(shareUrl);
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                }
-              }}
-              disabled={!context?.user?.fid}
-              className="w-full"
-            >
-              {copied ? "Copied!" : "Copy share URL"}
-            </Button>
-          </div>
-        )}
-
-        {activeTab === "context" && (
-          <div className="mx-6">
-            <h2 className="text-lg font-semibold mb-2 text-foreground">
-              Context
-            </h2>
+            {/* Wallet Connection Status */}
             <div className="p-4 bg-card text-card-foreground rounded-lg border border-border">
-              <pre className="font-mono text-xs whitespace-pre-wrap break-words w-full">
-                {JSON.stringify(context, null, 2)}
-              </pre>
+              <h3 className="font-semibold text-sm mb-2 text-primary">Wallet Connection</h3>
+              {isConnected && address ? (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Connected Address:
+                  </p>
+                  <p className="font-mono text-sm mb-2">{truncateAddress(address)}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                    <span className="text-xs text-green-600">Wallet Connected</span>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    No wallet connected
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block w-2 h-2 bg-gray-400 rounded-full"></span>
+                    <span className="text-xs text-gray-500">Not Connected</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-2">
+              <ShareButton
+                buttonText="Share Mini App"
+                cast={{
+                  text: "Check out this awesome frame! 🚀🪐",
+                  bestFriends: true,
+                  embeds: [
+                    `${process.env.NEXT_PUBLIC_URL}/share/${
+                      context?.user?.fid || ""
+                    }`,
+                  ],
+                }}
+                className="w-full"
+              />
+              
+              <Button
+                onClick={async () => {
+                  if (context?.user?.fid) {
+                    const shareUrl = `${process.env.NEXT_PUBLIC_URL}/share/${context.user.fid}`;
+                    await navigator.clipboard.writeText(shareUrl);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }
+                }}
+                disabled={!context?.user?.fid}
+                className="w-full"
+              >
+                {copied ? "Copied!" : "Copy Share URL"}
+              </Button>
+
+              <Button
+                onClick={actions.addMiniApp}
+                disabled={added}
+                className="w-full"
+              >
+                {added ? "Added to Client" : "Add Mini App to Client"}
+              </Button>
             </div>
           </div>
         )}

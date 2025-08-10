@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { APP_NAME } from "~/lib/constants";
-import sdk from "@farcaster/frame-sdk";
 import { useMiniApp } from "@neynar/react";
 
 type HeaderProps = {
@@ -12,73 +10,72 @@ type HeaderProps = {
   } | null;
 };
 
-export function Header({ neynarUser }: HeaderProps) {
+export function Header({ }: HeaderProps) {
   const { context } = useMiniApp();
-  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
-  const [hasClickedPfp, setHasClickedPfp] = useState(false);
 
   return (
-    <div className="relative">
-      <div className="mb-1 py-2 px-3 bg-card text-card-foreground rounded-lg flex items-center justify-between border-[3px] border-double border-primary">
-        <div className="text-lg font-light">Welcome to {APP_NAME}!</div>
-        {context?.user && (
-          <div
-            className="cursor-pointer"
-            onClick={() => {
-              setIsUserDropdownOpen(!isUserDropdownOpen);
-              setHasClickedPfp(true);
-            }}
-          >
-            {context.user.pfpUrl && (
-              <img
-                src={context.user.pfpUrl}
-                alt="Profile"
-                className="w-10 h-10 rounded-full border-2 border-primary"
-              />
-            )}
-          </div>
-        )}
-      </div>
-      {context?.user && (
-        <>
-          {!hasClickedPfp && (
-            <div className="absolute right-0 -bottom-6 text-xs text-primary flex items-center justify-end gap-1 pr-2">
-              <span className="text-[10px]">↑</span> Click PFP!{" "}
-              <span className="text-[10px]">↑</span>
+    <div className="sticky top-0 z-40 mb-6">
+      {/* Main Header */}
+      <div className="bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-600 text-white px-4 py-4 rounded-b-2xl shadow-lg">
+        <div className="flex items-center justify-between">
+          {/* App Name */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+              <span className="text-lg">🎨</span>
             </div>
-          )}
+            <div>
+              <h1 className="text-lg font-bold tracking-tight">{APP_NAME}</h1>
+              <p className="text-xs text-white/80">AI Image Studio</p>
+            </div>
+          </div>
 
-          {isUserDropdownOpen && (
-            <div className="absolute top-full right-0 z-50 w-fit mt-1 bg-card text-card-foreground rounded-lg shadow-lg border border-border">
-              <div className="p-3 space-y-2">
-                <div className="text-right">
-                  <h3
-                    className="font-bold text-sm hover:underline cursor-pointer inline-block text-foreground"
-                    onClick={() =>
-                      sdk.actions.viewProfile({ fid: context.user.fid })
-                    }
-                  >
-                    {context.user.displayName || context.user.username}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    @{context.user.username}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    FID: {context.user.fid}
-                  </p>
-                  {neynarUser && (
-                    <>
-                      <p className="text-xs text-muted-foreground">
-                        Neynar Score: {neynarUser.score}
-                      </p>
-                    </>
-                  )}
-                </div>
+          {/* User Profile */}
+          {context?.user && (
+            <div className="flex items-center gap-3">
+              {context.user.pfpUrl && (
+                <img
+                  src={context.user.pfpUrl}
+                  alt="Profile"
+                  className="w-10 h-10 rounded-full border-2 border-white/30 shadow-md"
+                />
+              )}
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-medium text-white">
+                  {context.user.displayName || context.user.username}
+                </p>
+                <p className="text-xs text-white/70">
+                  @{context.user.username}
+                </p>
               </div>
             </div>
           )}
-        </>
-      )}
+        </div>
+      </div>
+
+      {/* Status Bar */}
+      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-l-4 border-r-4 border-purple-500 px-4 py-2 mx-4 -mt-2 rounded-lg shadow-sm">
+        <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center gap-4">
+            {/* Connection Status */}
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-green-600 font-medium">Connected</span>
+            </div>
+            
+            {/* User FID */}
+            {context?.user && (
+              <span className="text-muted-foreground">
+                FID: {context.user.fid}
+              </span>
+            )}
+          </div>
+
+          {/* Time/Status */}
+          <div className="text-muted-foreground">
+            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

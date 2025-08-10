@@ -2,13 +2,38 @@
 
 import { useState } from "react";
 import { Button } from "./ui/Button";
-import { Download, Loader2, Wand2, RefreshCw } from "lucide-react";
+import { ShareButton } from "./ui/Share";
+import { Download, Loader2, Wand2, RefreshCw, Share2, Sparkles } from "lucide-react";
 
 interface GenerationSettings {
   size: "1024x1024" | "1024x1792" | "1792x1024";
   quality: "standard" | "hd";
   style: "vivid" | "natural";
 }
+
+// Web3-themed prompt suggestions
+const web3Prompts = [
+  {
+    emoji: "🚀",
+    title: "NFT Collection Art",
+    prompt: "A vibrant NFT collection featuring futuristic digital creatures with holographic effects, neon colors, and blockchain-inspired geometric patterns"
+  },
+  {
+    emoji: "⚡",
+    title: "DeFi Visualization", 
+    prompt: "An abstract representation of decentralized finance with flowing digital currencies, interconnected nodes, and glowing smart contracts in a cyberpunk style"
+  },
+  {
+    emoji: "🌐",
+    title: "Metaverse Scene",
+    prompt: "A stunning metaverse landscape with floating digital islands, virtual reality elements, avatar characters, and immersive Web3 technology"
+  },
+  {
+    emoji: "💎",
+    title: "Crypto Trading",
+    prompt: "A dynamic crypto trading scene with charts, candlesticks, Bitcoin and Ethereum symbols floating in a high-tech digital environment with blue and gold accents"
+  }
+];
 
 export default function ImageStudio() {
   const [prompt, setPrompt] = useState("");
@@ -86,6 +111,10 @@ export default function ImageStudio() {
     setError("");
   };
 
+  const usePromptSuggestion = (suggestedPrompt: string) => {
+    setPrompt(suggestedPrompt);
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="text-center space-y-2">
@@ -98,6 +127,33 @@ export default function ImageStudio() {
         <p className="text-gray-600 dark:text-gray-400">
           Create stunning images with AI using Azure OpenAI DALL-E 3
         </p>
+      </div>
+
+      {/* Web3 Prompt Suggestions */}
+      <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 p-4 rounded-xl border border-purple-200 dark:border-purple-800">
+        <div className="flex items-center gap-2 mb-3">
+          <Sparkles className="w-5 h-5 text-purple-600" />
+          <h3 className="font-semibold text-purple-900 dark:text-purple-100">Web3 Prompt Suggestions</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {web3Prompts.map((suggestion, index) => (
+            <button
+              key={index}
+              onClick={() => usePromptSuggestion(suggestion.prompt)}
+              className="text-left p-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border border-purple-200/50 dark:border-purple-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 hover:border-purple-300 dark:hover:border-purple-600 transition-all duration-200 group"
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">{suggestion.emoji}</span>
+                <span className="font-medium text-sm text-purple-900 dark:text-purple-100 group-hover:text-purple-700 dark:group-hover:text-purple-200">
+                  {suggestion.title}
+                </span>
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                {suggestion.prompt}
+              </p>
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -170,21 +226,21 @@ export default function ImageStudio() {
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="space-y-3">
             <Button
               onClick={generateImage}
               disabled={isLoading || !prompt.trim()}
-              className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+              className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Generating...
+                  <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                  <span>Generating...</span>
                 </>
               ) : (
                 <>
-                  <Wand2 className="w-4 h-4 mr-2" />
-                  Generate Image
+                  <Wand2 className="w-5 h-5 mr-3" />
+                  <span>Generate Image</span>
                 </>
               )}
             </Button>
@@ -192,9 +248,10 @@ export default function ImageStudio() {
             {(imageUrl || prompt || error) && (
               <Button
                 onClick={clearAll}
-                className="px-4 bg-gray-500 hover:bg-gray-600"
+                className="w-full h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 font-medium transition-all duration-200"
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="w-4 h-4 mr-2" />
+                <span>Clear & Start Over</span>
               </Button>
             )}
           </div>
@@ -236,20 +293,85 @@ export default function ImageStudio() {
                 </div>
               )}
 
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => window.open(imageUrl, '_blank')}
-                  className="flex-1 bg-gray-500 hover:bg-gray-600 border border-gray-300 dark:border-gray-600"
-                >
-                  View Full Size
-                </Button>
-                <Button
-                  onClick={downloadImage}
-                  className="flex-1 bg-gray-500 hover:bg-gray-600 border border-gray-300 dark:border-gray-600"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
-                </Button>
+              <div className="grid grid-cols-1 gap-3">
+                {/* Share Button */}
+                <ShareButton
+                  buttonText="Share on Farcaster"
+                  cast={{
+                    text: `Just created this amazing AI-generated image! 🎨✨\n\nPrompt: "${prompt.slice(0, 100)}${prompt.length > 100 ? '...' : ''}"\n\nCreated with AI Image Studio 🚀`,
+                    embeds: [
+                      {
+                        imageUrl: async () => imageUrl,
+                        url: imageUrl
+                      }
+                    ]
+                  }}
+                  className="w-full h-12 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+                />
+                
+                {/* Action Buttons Row */}
+                <div className="grid grid-cols-3 gap-2">
+                  <Button
+                    onClick={() => window.open(imageUrl, '_blank')}
+                    className="h-11 bg-blue-500 hover:bg-blue-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 text-sm"
+                  >
+                    <span className="text-lg">👁️</span>
+                    <span className="hidden sm:inline">View</span>
+                  </Button>
+                  
+                  <Button
+                    onClick={downloadImage}
+                    className="h-11 bg-green-500 hover:bg-green-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 text-sm"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span className="hidden sm:inline">Download</span>
+                  </Button>
+                  
+                  <Button
+                    onClick={() => {
+                      setImageUrl("");
+                      setRevisedPrompt("");
+                      setError("");
+                    }}
+                    className="h-11 bg-orange-500 hover:bg-orange-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 text-sm"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    <span className="hidden sm:inline">Retry</span>
+                  </Button>
+                </div>
+                
+                {/* Quick Actions */}
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    onClick={() => {
+                      if (navigator.share && imageUrl) {
+                        navigator.share({
+                          title: 'AI Generated Image',
+                          text: `Check out this AI-generated image: ${prompt.slice(0, 50)}...`,
+                          url: imageUrl
+                        }).catch(() => {
+                          // Fallback to copy URL
+                          navigator.clipboard.writeText(imageUrl);
+                        });
+                      } else {
+                        navigator.clipboard.writeText(imageUrl);
+                      }
+                    }}
+                    className="flex-1 h-9 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium border border-gray-300 dark:border-gray-600 transition-all duration-200"
+                  >
+                    📋 Copy Link
+                  </Button>
+                  
+                  <Button
+                    onClick={() => {
+                      const newPrompt = prompt + " with different style and composition";
+                      setPrompt(newPrompt);
+                    }}
+                    className="flex-1 h-9 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium border border-gray-300 dark:border-gray-600 transition-all duration-200"
+                  >
+                    🎲 Remix
+                  </Button>
+                </div>
               </div>
             </div>
           )}
